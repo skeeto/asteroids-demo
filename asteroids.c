@@ -513,6 +513,7 @@ game_sound(double now, enum sound what)
     case SOUND_SILENCE:
         if (now >= audio.deadline) {
             win32_clear();
+            len = AUDIO_HZ;
         }
         break;
     case SOUND_FIRE:
