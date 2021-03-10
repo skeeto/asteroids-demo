@@ -161,8 +161,8 @@ lltostr(char *buf, long long n)
     return len;
 }
 
-static void win32_play(int16_t *buf, size_t len);
-static void win32_clear(void);
+static void win32_audio_mix(int16_t *buf, size_t len);
+static void win32_audio_clear(size_t len);
 
 static int g_nlines;
 static struct {
@@ -512,17 +512,17 @@ game_sound(double now, enum sound what)
     switch (what) {
     case SOUND_SILENCE:
         if (now >= audio.deadline) {
-            win32_clear();
             len = AUDIO_HZ;
+            win32_audio_clear(len);
         }
         break;
     case SOUND_FIRE:
         len = COUNTOF(audio.pcm_fire);
-        win32_play(audio.pcm_fire, len);
+        win32_audio_mix(audio.pcm_fire, len);
         break;
     case SOUND_DESTROY:
         len = COUNTOF(audio.pcm_destroy);
-        win32_play(audio.pcm_destroy, len);
+        win32_audio_mix(audio.pcm_destroy, len);
         break;
     }
     if (len) audio.deadline = now + len/(double)AUDIO_HZ - 0.015;
@@ -873,15 +873,16 @@ sound_init(HWND wnd)
     return ds;
 }
 
+/* Silence the next LEN samples of the audio buffer. */
 static void
-win32_clear(void)
+win32_audio_clear(size_t len)
 {
     if (!win32_dsb) return;
 
     void *p0, *p1;
     DWORD z0, z1;
     DWORD r = IDirectSoundBuffer_Lock(
-        win32_dsb, 0, AUDIO_HZ*2, &p0, &z0, &p1, &z1, DSBLOCK_FROMWRITECURSOR
+        win32_dsb, 0, len*2, &p0, &z0, &p1, &z1, DSBLOCK_FROMWRITECURSOR
     );
     if (r != DS_OK) return;
     memset(p0, 0, z0);
@@ -889,8 +890,9 @@ win32_clear(void)
     IDirectSoundBuffer_Unlock(win32_dsb, p0, z1, p1, z1);
 }
 
+/* Mix a buffer of samples into the audio buffer. */
 static void
-win32_play(int16_t *buf, size_t len)
+win32_audio_mix(int16_t *buf, size_t len)
 {
     if (!win32_dsb) return;
 
