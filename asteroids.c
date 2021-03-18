@@ -16,6 +16,7 @@
 #  pragma comment(lib, "opengl32.lib")
 #  pragma comment(lib, "dsound.lib")
 #  pragma comment(lib, "xinput.lib")
+#  pragma comment(linker, "/subsystem:windows")
 #endif
 
 #define COUNTOF(a) (int)(sizeof(a) / sizeof(0[a]))
@@ -920,9 +921,11 @@ win32_audio_mix(int16_t *buf, size_t len)
     IDirectSoundBuffer_Unlock(win32_dsb, p0, z1, p1, z1);
 }
 
-int
-main(void)
+int WINAPI
+WinMain(HINSTANCE h, HINSTANCE prev, LPSTR cmd, int show)
 {
+    (void)h; (void)prev; (void)cmd; (void)show;
+
     HWND wnd = win32_window_init();
 
     sound_init(wnd);
