@@ -13,6 +13,9 @@ Other than the operating system and trivially-obtained compiler toolchain,
 there are no build dependencies. There are also no run-time dependencies,
 so distribution of the game .exe is trivial.
 
+For an introduction and overview of the game's source code, see [Nolan
+Prescott's excellent guide][guide].
+
 ## Build
 
 Download a [w64devkit][] release, unzip anywhere, double-click the
@@ -42,4 +45,5 @@ Then run with Wine:
     wine64 ./asteroids.exe
 
 
+[guide]: https://idle.nprescott.com/2021/understanding-asteroids.html
 [w64devkit]: https://github.com/skeeto/w64devkit
