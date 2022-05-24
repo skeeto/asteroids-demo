@@ -411,10 +411,10 @@ game_init(int size)
         audio.pcm_fire[i] = 0x7fff * sinf(2*PI*t*f)*(1 - v*v);
     }
 
-    for (int i = 0; i < COUNTOF(audio.pcm_destroy); i += 12) {
-        int16_t s = 0x7fff * randu();
-        for (int j = 0; j < 12; j++) {
-            audio.pcm_destroy[i+j] = s;
+    for (int i = 0; i < COUNTOF(audio.pcm_destroy); i++) {
+        switch (i % 12) {
+        case  0: audio.pcm_destroy[i] = 0x7fff * randu(); break;
+        default: audio.pcm_destroy[i] = audio.pcm_destroy[i-1];
         }
     }
 }
