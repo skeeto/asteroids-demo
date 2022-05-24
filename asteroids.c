@@ -937,7 +937,7 @@ WinMain(HINSTANCE h, HINSTANCE prev, LPSTR cmd, int show)
         MSG msg;
         while (PeekMessage(&msg, 0, 0, 0, TRUE)) {
             if (msg.message == WM_QUIT) {
-                ExitProcess(0);
+                TerminateProcess(GetCurrentProcess(), 0);
             }
             TranslateMessage(&msg);
             DispatchMessage(&msg);
