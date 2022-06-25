@@ -3,7 +3,7 @@ CROSS   =
 CC      = $(CROSS)gcc
 CFLAGS  = -std=c99 -DNDEBUG -ffast-math -Os
 LDFLAGS = -s -mwindows
-LDLIBS  = -lgdi32 -lopengl32 -ldsound
+LDLIBS  = -lwinmm -lgdi32 -lopengl32 -ldsound
 WINDRES = $(CROSS)windres
 
 D_CFLAGS  = -Wall -Wextra -Wdouble-promotion -g -Og

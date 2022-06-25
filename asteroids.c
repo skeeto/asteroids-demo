@@ -11,6 +11,7 @@
 
 /* Simplify building with Visual Studio (cl.exe) */
 #ifdef _MSC_VER
+#  pragma comment(lib, "winmm.lib")
 #  pragma comment(lib, "gdi32.lib")
 #  pragma comment(lib, "user32.lib")
 #  pragma comment(lib, "opengl32.lib")
@@ -969,7 +970,9 @@ WinMain(HINSTANCE h, HINSTANCE prev, LPSTR cmd, int show)
 
     int joysticks = joystick_discovery();
 
+    timeBeginPeriod(1);
     double freq = counter_freq();
+
     HDC hdc = GetDC(wnd);
     for (;;) {
         double start = counter_now();
