@@ -997,7 +997,7 @@ WinMain(HINSTANCE h, HINSTANCE prev, LPSTR cmd, int show)
             // necessary.
             double rem = 1.0/FRAMERATE - (counter_now() - start)/freq;
             if (rem > 0.001) {
-                Sleep(1000 * rem);
+                Sleep(1000*rem - 0.5);
             }
         }
     }
