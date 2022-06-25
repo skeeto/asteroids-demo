@@ -15,7 +15,6 @@
 #  pragma comment(lib, "user32.lib")
 #  pragma comment(lib, "opengl32.lib")
 #  pragma comment(lib, "dsound.lib")
-#  pragma comment(lib, "xinput.lib")
 #  pragma comment(linker, "/subsystem:windows")
 #endif
 
@@ -789,14 +788,35 @@ win32_window_init(void)
     return CreateWindow("gl", title, style, x, y, size, size, 0, 0, 0, 0);
 }
 
+static void  (*XInputEnable_p)(BOOL);
+static DWORD (*XInputGetState_p)(DWORD, XINPUT_STATE *);
+static DWORD (*XInputGetKeystroke_p)(DWORD, DWORD, PXINPUT_KEYSTROKE);
+
 static int
 joystick_discovery(void)
 {
+    static char dll[][16] = {
+        "xinput1_4.dll", "xinput1_3.dll", "xinput9_1_0.dll"
+    };
+    HINSTANCE h = 0;
+    for (int i = 0; !h && i < COUNTOF(dll); i++) {
+        h = LoadLibraryA(dll[i]);
+    }
+    if (!h) {
+        return 0;
+    }
+    XInputEnable_p = (void *)GetProcAddress(h, "XInputEnable");
+    XInputGetState_p = (void *)GetProcAddress(h, "XInputGetState");
+    XInputGetKeystroke_p = (void *)GetProcAddress(h, "XInputGetKeystroke");
+    if (!XInputEnable_p || !XInputGetState_p || !XInputGetKeystroke_p) {
+        return 0;  // xinput9_1_0.dll is often broken
+    }
+
     int bits = 0;
-    XInputEnable(TRUE);
+    XInputEnable_p(TRUE);
     for (int i = 0; i < 4; i++) {
         XINPUT_STATE state;
-        if (!XInputGetState(i, &state)) {
+        if (!XInputGetState_p(i, &state)) {
             bits |= 1 << i;
         }
     }
@@ -810,7 +830,7 @@ joystick_read(int bits)
         if (!(bits & 1<<i)) continue;
         int limit = 32;
         XINPUT_KEYSTROKE k;
-        while (--limit && XInputGetKeystroke(i, 0, &k) == ERROR_SUCCESS) {
+        while (--limit && XInputGetKeystroke_p(i, 0, &k) == ERROR_SUCCESS) {
             int control = 0;
             switch (k.VirtualKey) {
             case VK_PAD_A:
