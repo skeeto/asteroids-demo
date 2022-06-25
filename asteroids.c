@@ -19,6 +19,7 @@
 #endif
 
 #define COUNTOF(a) (int)(sizeof(a) / sizeof(0[a]))
+#define FRAMERATE 60
 #define PI 0x1.921fb6p+1f
 
 #define FATAL(msg)                                      \
@@ -941,6 +942,22 @@ win32_audio_mix(int16_t *buf, size_t len)
     IDirectSoundBuffer_Unlock(win32_dsb, p0, z1, p1, z1);
 }
 
+static double
+counter_freq(void)
+{
+    LARGE_INTEGER freq;
+    QueryPerformanceFrequency(&freq);
+    return freq.QuadPart;
+}
+
+static double
+counter_now(void)
+{
+    LARGE_INTEGER t;
+    QueryPerformanceCounter(&t);
+    return t.QuadPart;
+}
+
 int WINAPI
 WinMain(HINSTANCE h, HINSTANCE prev, LPSTR cmd, int show)
 {
@@ -952,8 +969,11 @@ WinMain(HINSTANCE h, HINSTANCE prev, LPSTR cmd, int show)
 
     int joysticks = joystick_discovery();
 
+    double freq = counter_freq();
     HDC hdc = GetDC(wnd);
     for (;;) {
+        double start = counter_now();
+
         MSG msg;
         while (PeekMessage(&msg, 0, 0, 0, TRUE)) {
             if (msg.message == WM_QUIT) {
@@ -962,11 +982,20 @@ WinMain(HINSTANCE h, HINSTANCE prev, LPSTR cmd, int show)
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
+
         if (win32_opengl_initialized) {
             joystick_read(joysticks);
             game_step();
             game_render();
             SwapBuffers(hdc);
+
+            // Some systems have a broken swap interval (virtual machines,
+            // certain Wine configurations), so sleep rest of the frame if
+            // necessary.
+            double rem = 1.0/FRAMERATE - (counter_now() - start)/freq;
+            if (rem > 0.001) {
+                Sleep(1000 * rem);
+            }
         }
     }
     return 0;
