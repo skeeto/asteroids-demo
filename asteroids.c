@@ -908,8 +908,8 @@ win32_audio_clear(size_t len)
         win32_dsb, 0, len*2, &p0, &z0, &p1, &z1, DSBLOCK_FROMWRITECURSOR
     );
     if (r != DS_OK) return;
-    memset(p0, 0, z0);
-    memset(p1, 0, z1);
+    if (p0) memset(p0, 0, z0);
+    if (p1) memset(p1, 0, z1);
     IDirectSoundBuffer_Unlock(win32_dsb, p0, z1, p1, z1);
 }
 
