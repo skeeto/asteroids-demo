@@ -18,10 +18,20 @@ Prescott's excellent guide][guide].
 
 ## Build
 
-Download a [w64devkit][] release, unzip anywhere, double-click the
-unzipped `activate.bat` to bring up a console window, navigate to this
-source directory (`cd`), and run `make`. This compiles a ready-to-play
-47kB `asteroids.exe`.
+Download a [w64devkit][] release, unzip anywhere, run `w64devkit.exe` to
+bring up a console window, navigate to this source directory (`cd`), and
+run `make`. This compiles a ready-to-play ~50kB `asteroids.exe`.
+
+To hack on it, create a debug build by customizing `CFLAGS` and `LDFLAGS`:
+
+    $ export LDFLAGS=""
+    $ export CFLAGS="-ggdb3 -Wall -Wextra -Wdouble-promotion"
+    $ CFLAGS="$CFLAGS -fsanitize=undefined -fsanitize-undefined-trap-on-error"
+    $ make -e
+    $ gdb ./asteroids.exe
+
+This disables optimization, maximizes debug information, enables run-time
+instrumentation, and provides linting.
 
 ## Gameplay
 
