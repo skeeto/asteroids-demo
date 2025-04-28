@@ -790,9 +790,9 @@ win32_window_init(void)
     return CreateWindow("gl", title, style, x, y, size, size, 0, 0, 0, 0);
 }
 
-static void  (*XInputEnable_p)(BOOL);
-static DWORD (*XInputGetState_p)(DWORD, XINPUT_STATE *);
-static DWORD (*XInputGetKeystroke_p)(DWORD, DWORD, PXINPUT_KEYSTROKE);
+static void  (WINAPI *XInputEnable_p)(BOOL);
+static DWORD (WINAPI *XInputGetState_p)(DWORD, XINPUT_STATE *);
+static DWORD (WINAPI *XInputGetKeystroke_p)(DWORD, DWORD, PXINPUT_KEYSTROKE);
 
 static int
 joystick_discovery(void)
